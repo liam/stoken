@@ -4,7 +4,7 @@ exports.config = {
       restURL: "https://trest.bitcoin.com/v1/"
     },
     production: {
-      restURL: "https://trest.bitcoin.com/v1/"
+      restURL: "https://rest.bitcoin.com/v1/"
     }
   }
 };

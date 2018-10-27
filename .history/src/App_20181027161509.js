@@ -3,7 +3,7 @@ import logo from "./logo.png";
 
 import "./App.css";
 let BITBOXSDK = require("bitbox-sdk/lib/bitbox-sdk").default;
-let BITBOX = new BITBOXSDK({restURL: "https://trest.bitcoin.com/v1/"});
+let BITBOX = new BITBOXSDK();
 
 let langs = [
   "english",
@@ -21,6 +21,7 @@ let lang = langs[Math.floor(Math.random() * langs.length)];
 // create 256 bit BIP39 mnemonic
 //let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
 // use the same key always
+let mnemonic ="échelle vétéran panorama quiétude météore fatal rubis ferveur gorge enfance matière surprise ronce temporel pochette bistouri monnaie oisillon loyal bitume sodium dénuder subtil accepter"
 
 
 // root seed buffer
@@ -55,26 +56,26 @@ class App extends Component {
         if (!result[0]) {
           return;
         }
-        console.log(result);
+
         // instance of transaction builder
         let transactionBuilder = new BITBOX.TransactionBuilder("testnet");
         // original amount of satoshis in vin
         // let originalAmount = result[0].satoshis;
-        let originalAmount = 2699889342
+        let originalAmount = 5
         // index of vout
         let vout = result[0].vout;
 
         // txid of vout
         let txid = result[0].txid;
+
         // add input with txid and index of vout
         transactionBuilder.addInput(txid, vout);
-        
+
         // get byte count to calculate fee. paying 1 sat/byte
         let byteCount = BITBOX.BitcoinCash.getByteCount(
           { P2PKH: 1 },
-          { P2PKH: 3 }
-          );
-          console.log('bytecount, ', byteCount)
+          { P2PKH: 1 }
+        );
         // 192
         // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
         let sendAmount = originalAmount - byteCount;
@@ -86,14 +87,14 @@ class App extends Component {
         let keyPair = BITBOX.HDNode.toKeyPair(change);
 
         // sign w/ HDNode
-        let buf = BITBOX.Script.nullData.output.encode(Buffer.from('test for beetles', 'ascii'));
-  //
+        let buf = new Buffer('test for beetles');
 
-        transactionBuilder.addOutput(buf, 0);
+        let redeemScript = BITBOX.Script.encode([
+          BITBOX.Script.opcodes.OP_RETURN,
+          buf
+        ])
 
-        let redeemScript ;
 
-        console.log('here!')
         
         transactionBuilder.sign(
           0,
@@ -111,8 +112,6 @@ class App extends Component {
           hex: hex
         });
 
-        // TODO: comment out to send
-        return false;
         // sendRawTransaction to running BCH node
         BITBOX.RawTransactions.sendRawTransaction(hex).then(
           result => {
@@ -126,10 +125,9 @@ class App extends Component {
         );
       },
       err => {
-        console.log("error", err);
+        console.log(err);
       }
     );
-    console.log('end')
   }
 
   render() {

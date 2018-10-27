@@ -21,6 +21,7 @@ let lang = langs[Math.floor(Math.random() * langs.length)];
 // create 256 bit BIP39 mnemonic
 //let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
 // use the same key always
+let mnemonic ="échelle vétéran panorama quiétude météore fatal rubis ferveur gorge enfance matière surprise ronce temporel pochette bistouri monnaie oisillon loyal bitume sodium dénuder subtil accepter"
 
 
 // root seed buffer
@@ -55,12 +56,11 @@ class App extends Component {
         if (!result[0]) {
           return;
         }
-        console.log(result);
         // instance of transaction builder
         let transactionBuilder = new BITBOX.TransactionBuilder("testnet");
         // original amount of satoshis in vin
         // let originalAmount = result[0].satoshis;
-        let originalAmount = 2699889342
+        let originalAmount = 100000
         // index of vout
         let vout = result[0].vout;
 
@@ -72,7 +72,7 @@ class App extends Component {
         // get byte count to calculate fee. paying 1 sat/byte
         let byteCount = BITBOX.BitcoinCash.getByteCount(
           { P2PKH: 1 },
-          { P2PKH: 3 }
+          { P2PKH: 1 }
           );
           console.log('bytecount, ', byteCount)
         // 192
@@ -111,8 +111,6 @@ class App extends Component {
           hex: hex
         });
 
-        // TODO: comment out to send
-        return false;
         // sendRawTransaction to running BCH node
         BITBOX.RawTransactions.sendRawTransaction(hex).then(
           result => {
@@ -134,6 +132,7 @@ class App extends Component {
 
   render() {
     let addresses = [];
+    console.log('in render')
     for (let i = 0; i < 10; i++) {
       let account = masterHDNode.derivePath(`m/44'/145'/0'/0/${i}`);
       addresses.push(
