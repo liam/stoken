@@ -16,3 +16,5 @@
 7. Win
 
 [![Build Status](https://travis-ci.org/Bitcoin-com/bitbox-scaffold-react.svg?branch=master)](https://travis-ci.org/Bitcoin-com/bitbox-scaffold-react)
+
+Test
