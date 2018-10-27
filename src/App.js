@@ -91,6 +91,7 @@ class App extends Component {
         // add input with txid and index of vout
         transactionBuilder.addInput(txid, vout);
         
+        let anotherAddress = "bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd"
         // get byte count to calculate fee. paying 1 sat/byte
         let byteCount = BITBOX.BitcoinCash.getByteCount(
           { P2PKH: 1 },
@@ -100,9 +101,12 @@ class App extends Component {
         // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
         let sendAmount = originalAmount - byteCount;
 
+        let reviewCost = 100
+        sendAmount -= reviewCost
         // add output w/ address and amount to send
         transactionBuilder.addOutput(cashAddress, sendAmount);
-
+        transactionBuilder.addOutput(anotherAddress, reviewCost)
+        // change address bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd
         // keypair
         let keyPair = BITBOX.HDNode.toKeyPair(change);
 
@@ -134,12 +138,13 @@ class App extends Component {
         // sendRawTransaction to running BCH node
         BITBOX.RawTransactions.sendRawTransaction(hex).then(
           result => {
+            console.log('successfully send transaction:', result)
             this.setState({
               txid: result
             });
           },
           err => {
-            console.log(err);
+            console.log('error sending transaction:', err);
           }
         );
       },
@@ -162,6 +167,7 @@ class App extends Component {
   }
 
   sendRequest = () => {
+  this.sendTransaction()
     // this.setState(state => ({
     //   isToggleOn: !state.isToggleOn
     // }));
