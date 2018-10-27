@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import logo from "./logo.png";
 import Slider from 'react-rangeslider'
-import { FormControl } from 'react-bootstrap';
+import {Badge , Panel , FormGroup, Checkbox , FormControl} from 'react-bootstrap'
+
 
 import "./App.css";
 import 'react-rangeslider/lib/index.css'
@@ -25,7 +26,7 @@ let lang = langs[Math.floor(Math.random() * langs.length)];
 // create 256 bit BIP39 mnemonic
 //let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
 // use the same key always
-
+let mnemonic ="échelle vétéran panorama quiétude météore fatal rubis ferveur gorge enfance matière surprise ronce temporel pochette bistouri monnaie oisillon loyal bitume sodium dénuder subtil accepter"
 
 // root seed buffer
 let rootSeed = BITBOX.Mnemonic.toSeed(mnemonic);
@@ -53,7 +54,9 @@ class App extends Component {
       commSkills: 0,
       workWithOther:0,
       address1:'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd',
-      address2:'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et'
+      address2:'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et',
+      askCommSkills: false,
+      askWorkWithOther: false
     };
   }  
   
@@ -248,13 +251,14 @@ class App extends Component {
   }
 
   sendRequest = () => {
-    this.sendRatingsRequests()
+   // this.sendRatingsRequests()
     console.log('commsSkill:',this.state.commSkills );
     console.log('workWithOthers:',this.state.workWithOther );
     console.log('Sending......' );
     console.log('Done......' );
 
   }
+
   handleOnChangeAddress1 = (e) => {
     this.setState({
       address1: e.target.value
@@ -266,6 +270,29 @@ class App extends Component {
       address2: e.target.value
           })
         }
+
+handleOnChangeAsk1 = (e) => {
+      this.setState({
+        askWorkWithOther: e.target.checked
+      })
+    }
+        
+    handleOnChangeAsk2 = (e) => {
+
+            this.setState({
+                askCommSkills: e.target.checked
+
+            })
+          }
+
+    sendFeedback = () => {
+    // this.sendRatingsRequests()
+     console.log('commsSkill:',this.state.commSkills );
+     console.log('workWithOthers:',this.state.workWithOther );
+     console.log('Sending......' );
+     console.log('Done......' );
+ 
+   }
 
   render() {
     let addresses = [];
@@ -288,63 +315,86 @@ class App extends Component {
           <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" ></link>
         </header>
         <div className="App-content">
-          <h2>BIP44 $BCH Wallet</h2>
-          <h3>256 bit {lang} BIP39 Mnemonic:</h3> <p>{this.state.mnemonic}</p>
-          <h3>BIP44 Account</h3>
-          <p>
-            <code>"m/44'/145'/0'"</code>
-          </p>
-          <h3>BIP44 external change addresses</h3>
-          <ul>{addresses}</ul>
-          <h3>Transaction raw hex</h3>
-          <p>{this.state.hex}</p>
-          <h3>Transaction ID</h3>
-          <p>{this.state.txid}</p>
-          <h2>Create a Feedback request</h2>
-          <div>
-          <h3>Works Well With Others</h3>
-          <Slider value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} max={10} step={1} onChange={this.handleOnChangeSlider1}/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <h3>Communication Skills</h3>
-          <Slider value={commSkills} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} max={10} step={1} onChange={this.handleOnChangeSlider2}/>
-        </div>
-        <br/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
+        <br/>
+        <br/>
 
-          <FormControl
-            type="text"
-            value={this.state.address1}
-            placeholder="Enter address 1"
-            onChange={this.handleOnChangeAddress1}
-          />
-          <br/>
-          <br/>
-          <br/>
+        <Panel bsStyle="info">
+          <Panel.Heading>
+            <Panel.Title componentClass="h2">Create a feedback request</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body >
+            <h4>Select questions</h4>
 
-          <FormControl
-            type="text"
-            value={this.state.address2}
-            placeholder="Enter address 2"
-            onChange={this.handleOnChangeAddress2}
-          />
-          <br/>
-          <br/>
-          <br/>
+            <FormGroup>
+              <Checkbox inline onChange={this.handleOnChangeAsk1}>Works Well With Others</Checkbox> <Checkbox inline onChange={this.handleOnChangeAsk2}>Communication Skills</Checkbox>
+              <br/>
+              <br/>
+              <br/>
+            </FormGroup>
+            <h4>Request Feedback from address 1 </h4>
+              <FormControl
+              type="text"
+              value={this.state.address1}
+              placeholder="Enter address 1"
+              onChange={this.handleOnChangeAddress1}
+            />
+           <br/>
+            <h4>Request Feedback from address 1 </h4>
+            <FormControl
+              label="Text"
+              type="text"
+              value={this.state.address2}
+              placeholder="Enter address 2"
+              onChange={this.handleOnChangeAddress2}
+            />
+            <br/>
+            <br/>
+            <button className="btn btn-primary" onClick={this.sendRequest}>
+             Send Request
+            </button>
+          </Panel.Body>
+        </Panel>
+         <br/>
+         <br/>
+         <br/>
+        <Panel bsStyle="success">
+          <Panel.Heading>
+            <Panel.Title componentClass="h3">Create a feedback request</Panel.Title>
+          </Panel.Heading>
+            <Panel.Body>Panel content
+            <h2>Provide feedback </h2>
+            <h3>Works Well With Others</h3> 
+            <Slider value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0}           max={10} step={1} onChange={this.handleOnChangeSlider1}/> 
+            <br/>
+            <br/>   
+           <h3>Communication Skills</h3> 
+           <Slider value={commSkills} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} 
+            max={10} step={1} onChange={this.handleOnChangeSlider2}/> 
+            <br/>
+            <br/> 
+            <button className="btn btn-primary" onClick={this.sendFeedback}>
+              Send Feedback
+             </button>
+          </Panel.Body>
+        </Panel>
+         <br/>
+         <br/>
+         <br/>
 
-        <button className="btn btn-primary" onClick={this.sendRequest}>
-            Send Request
-        </button>
+        <Panel bsStyle="primary">
+          <Panel.Heading>
+            <Panel.Title componentClass="h3">View feedback</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body>
+          <h3>
+          Works Well With Others   <Badge>{this.state.workWithOther}</Badge>
+          </h3>
+          <h3>
+          Communication Skills     <Badge>{this.state.commSkills}</Badge>
+          </h3>
+          </Panel.Body>
+        </Panel>
 
-
-          <div>
-          </div>
         </div>
       </div>
     );
