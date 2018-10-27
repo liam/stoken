@@ -9,6 +9,7 @@
     "node-sass": "^4.9.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-bootstrap": "^0.32.4",
     "react-scripts": "1.1.1",
     "sass-loader": "^7.0.1",
     "react-rangeslider": "^2.2.0"

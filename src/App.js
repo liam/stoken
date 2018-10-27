@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import logo from "./logo.png";
 import Slider from 'react-rangeslider'
+import { FormControl } from 'react-bootstrap';
 
 import "./App.css";
 import 'react-rangeslider/lib/index.css'
@@ -24,7 +25,6 @@ let lang = langs[Math.floor(Math.random() * langs.length)];
 // create 256 bit BIP39 mnemonic
 //let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
 // use the same key always
-let mnemonic ="échelle vétéran panorama quiétude météore fatal rubis ferveur gorge enfance matière surprise ronce temporel pochette bistouri monnaie oisillon loyal bitume sodium dénuder subtil accepter"
 
 
 // root seed buffer
@@ -51,7 +51,9 @@ class App extends Component {
       hex: "",
       txid: "",
       commSkills: 0,
-      workWithOther:0
+      workWithOther:0,
+      address1:'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd',
+      address2:'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et'
     };
   }  
   
@@ -63,16 +65,95 @@ class App extends Component {
     return BITBOX.Script.nullData.output.decode(Buffer.from(hex, 'hex')).toString('ascii');
   }
 
-  sendRatingsRequests(addresses, questions) {
+  sendRatingsRequests(/** addresses, questions*/) {
+    let addresses = ['bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', 'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et']
+    let questions = 'w1,c1'
+    
+    const reviewCost = 100
 
+    BITBOX.Address.utxo(cashAddress).then(
+      result => {
+        if (!result[0]) {
+          return;
+        }
+        // instance of transaction builder
+        let transactionBuilder = new BITBOX.TransactionBuilder("testnet");
+        // original amount of satoshis in vin
+        let originalAmount = result[0].satoshis;
+        //let originalAmount = 2699889342
+        // index of vout
+        let vout = result[0].vout;
+
+        // txid of vout
+        let txid = result[0].txid;
+        // add input with txid and index of vout
+        transactionBuilder.addInput(txid, vout);
+        
+        // get byte count to calculate fee. paying 1 sat/byte
+        let byteCount = BITBOX.BitcoinCash.getByteCount(
+          { P2PKH: 1 },
+          { P2PKH: 3 }
+          );
+        // 192
+        // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
+        let sendAmount = originalAmount - byteCount;
+
+        sendAmount -= (reviewCost * addresses.length)
+        // add output w/ address and amount to send
+        transactionBuilder.addOutput(cashAddress, sendAmount);
+
+        addresses.array.forEach(address => {
+          transactionBuilder.addOutput(address, reviewCost)          
+        });
+
+        // keypair
+        let keyPair = BITBOX.HDNode.toKeyPair(change);
+
+        // sign w/ HDNode
+        let buf = this.encodeScript(questions);
+
+        transactionBuilder.addOutput(buf, 0);
+
+        let redeemScript ;
+        
+        transactionBuilder.sign(
+          0,
+          keyPair,
+          redeemScript,
+          transactionBuilder.hashTypes.SIGHASH_ALL,
+          originalAmount
+        );
+
+        // build tx
+        let tx = transactionBuilder.build();
+        // output rawhex
+        let hex = tx.toHex();
+        this.setState({
+          hex: hex
+        });
+
+        // TODO: comment out to send
+        return false;
+        // sendRawTransaction to running BCH node
+        BITBOX.RawTransactions.sendRawTransaction(hex).then(
+          result => {
+            console.log('successfully send transaction:', result)
+            this.setState({
+              txid: result
+            });
+          },
+          err => {
+            console.log('error sending transaction:', err);
+          }
+        );
+      },
+      err => {
+        console.log("error", err);
+      }
+    );
   }
 
   sendRatingsReply(address, answers) {
-
-  }
-
-
-  sendTransaction() {
     BITBOX.Address.utxo(cashAddress).then(
       result => {
         if (!result[0]) {
@@ -167,16 +248,25 @@ class App extends Component {
   }
 
   sendRequest = () => {
-  this.sendTransaction()
-    // this.setState(state => ({
-    //   isToggleOn: !state.isToggleOn
-    // }));
+    this.sendRatingsRequests()
     console.log('commsSkill:',this.state.commSkills );
     console.log('workWithOthers:',this.state.workWithOther );
     console.log('Sending......' );
     console.log('Done......' );
 
   }
+  handleOnChangeAddress1 = (e) => {
+    this.setState({
+      address1: e.target.value
+    })
+  }
+      
+  handleOnChangeAddress2 = (e) => {
+          this.setState({
+      address2: e.target.value
+          })
+        }
+
   render() {
     let addresses = [];
     let { commSkills, workWithOther} = this.state
@@ -193,7 +283,9 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Hello BITBOX</h1>
+          <h1 className="App-title">BlokkFeedbackChain</h1>
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" ></link>
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" ></link>
         </header>
         <div className="App-content">
           <h2>BIP44 $BCH Wallet</h2>
@@ -225,7 +317,28 @@ class App extends Component {
           <br/>
           <br/>
           <br/>
-        <button className="btn btn-default" onClick={this.sendRequest}>
+
+          <FormControl
+            type="text"
+            value={this.state.address1}
+            placeholder="Enter address 1"
+            onChange={this.handleOnChangeAddress1}
+          />
+          <br/>
+          <br/>
+          <br/>
+
+          <FormControl
+            type="text"
+            value={this.state.address2}
+            placeholder="Enter address 2"
+            onChange={this.handleOnChangeAddress2}
+          />
+          <br/>
+          <br/>
+          <br/>
+
+        <button className="btn btn-primary" onClick={this.sendRequest}>
             Send Request
         </button>
 
