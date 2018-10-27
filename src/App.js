@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import logo from "./logo.png";
+import Slider from 'react-rangeslider'
 
 import "./App.css";
+import 'react-rangeslider/lib/index.css'
+
 let BITBOXSDK = require("bitbox-sdk/lib/bitbox-sdk").default;
 let BITBOX = new BITBOXSDK({restURL: "https://trest.bitcoin.com/v1/"});
 
@@ -21,6 +24,7 @@ let lang = langs[Math.floor(Math.random() * langs.length)];
 // create 256 bit BIP39 mnemonic
 //let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
 // use the same key always
+let mnemonic ="échelle vétéran panorama quiétude météore fatal rubis ferveur gorge enfance matière surprise ronce temporel pochette bistouri monnaie oisillon loyal bitume sodium dénuder subtil accepter"
 
 
 // root seed buffer
@@ -45,22 +49,40 @@ class App extends Component {
       mnemonic: mnemonic,
       lang: lang,
       hex: "",
-      txid: ""
+      txid: "",
+      commSkills: 0,
+      workWithOther:0
     };
+  }  
+  
+  encodeScript(text) {
+    return BITBOX.Script.nullData.output.encode(Buffer.from(text, 'ascii'))
   }
 
-  componentDidMount() {
+  decodeScript(hex) {
+    return BITBOX.Script.nullData.output.decode(Buffer.from(hex, 'hex')).toString('ascii');
+  }
+
+  sendRatingsRequests(addresses, questions) {
+
+  }
+
+  sendRatingsReply(address, answers) {
+
+  }
+
+
+  sendTransaction() {
     BITBOX.Address.utxo(cashAddress).then(
       result => {
         if (!result[0]) {
           return;
         }
-        console.log(result);
         // instance of transaction builder
         let transactionBuilder = new BITBOX.TransactionBuilder("testnet");
         // original amount of satoshis in vin
-        // let originalAmount = result[0].satoshis;
-        let originalAmount = 2699889342
+        let originalAmount = result[0].satoshis;
+        //let originalAmount = 2699889342
         // index of vout
         let vout = result[0].vout;
 
@@ -74,7 +96,6 @@ class App extends Component {
           { P2PKH: 1 },
           { P2PKH: 3 }
           );
-          console.log('bytecount, ', byteCount)
         // 192
         // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
         let sendAmount = originalAmount - byteCount;
@@ -86,14 +107,11 @@ class App extends Component {
         let keyPair = BITBOX.HDNode.toKeyPair(change);
 
         // sign w/ HDNode
-        let buf = BITBOX.Script.nullData.output.encode(Buffer.from('test for beetles', 'ascii'));
-  //
+        let buf = this.encodeScript('test for beetles');
 
         transactionBuilder.addOutput(buf, 0);
 
         let redeemScript ;
-
-        console.log('here!')
         
         transactionBuilder.sign(
           0,
@@ -129,20 +147,42 @@ class App extends Component {
         console.log("error", err);
       }
     );
-    console.log('end')
   }
 
+  handleOnChangeSlider1 = (value) => {
+    this.setState({
+      workWithOther: value
+    })
+  }
+
+  handleOnChangeSlider2 = (value) => {
+    this.setState({
+      commSkills: value
+    })
+  }
+
+  sendRequest = () => {
+    // this.setState(state => ({
+    //   isToggleOn: !state.isToggleOn
+    // }));
+    console.log('commsSkill:',this.state.commSkills );
+    console.log('workWithOthers:',this.state.workWithOther );
+    console.log('Sending......' );
+    console.log('Done......' );
+
+  }
   render() {
     let addresses = [];
-    for (let i = 0; i < 10; i++) {
-      let account = masterHDNode.derivePath(`m/44'/145'/0'/0/${i}`);
-      addresses.push(
-        <li key={i}>
-          m/44&rsquo;/145&rsquo;/0&rsquo;/0/
-          {i}: {BITBOX.HDNode.toCashAddress(account)}
-        </li>
-      );
-    }
+    let { commSkills, workWithOther} = this.state
+    // for (let i = 0; i < 10; i++) {
+    //   let account = masterHDNode.derivePath(`m/44'/145'/0'/0/${i}`);
+    //   addresses.push(
+    //     <li key={i}>
+    //       m/44&rsquo;/145&rsquo;/0&rsquo;/0/
+    //       {i}: {BITBOX.HDNode.toCashAddress(account)}
+    //     </li>
+    //   );
+    // }
     return (
       <div className="App">
         <header className="App-header">
@@ -162,6 +202,30 @@ class App extends Component {
           <p>{this.state.hex}</p>
           <h3>Transaction ID</h3>
           <p>{this.state.txid}</p>
+          <h2>Create a Feedback request</h2>
+          <div>
+          <h3>Works Well With Others</h3>
+          <Slider value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} max={10} step={1} onChange={this.handleOnChangeSlider1}/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <h3>Communication Skills</h3>
+          <Slider value={commSkills} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} max={10} step={1} onChange={this.handleOnChangeSlider2}/>
+        </div>
+        <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+        <button className="btn btn-default" onClick={this.sendRequest}>
+            Send Request
+        </button>
+
+
+          <div>
+          </div>
         </div>
       </div>
     );
