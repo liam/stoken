@@ -73,15 +73,15 @@ class App extends Component {
       txid: "",
       commSkills: 0,
       workWithOther:0,
-      address1:'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', //Feedback  1 provider address 
-      address2:'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et', //Feedback  1 provider address 
+      address1:'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', // Feedback 1 provider address 
+      address2:'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et', // Feedback 1 provider address 
       askCommSkills: false,
       askWorkWithOther: false,
       requestQuestionsList: [],   // p1,p2
       receivedQuestionsList: ['p1','p2'],  // p1,p2
       receivedAnswersList: [],    // p1:4,p2:8
       answerList:[],
-      addressForFeedback: 'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd' //Address of feedback provider 1 to fetch request 
+      addressForFeedback: 'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd' // Address of feedback provider 1 to fetch request 
     };
   }  
   
@@ -99,12 +99,11 @@ class App extends Component {
 
   sendRatingsRequests() {
     /*
-    Example of OP_RETURN
-    'RT1,req,rp1,p1,p2,p3'
-    AppScriptPrefix, messageType, reviewTypes, questionKeys
-
+      Example of OP_RETURN
+      'RT1,req,rp1,p1,p2,p3'
+      AppScriptPrefix, messageType, reviewTypes, questionKeys
     */
-    let addresses = ['bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', 'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et']
+    const addresses = ['bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', 'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et']
     let questions = this.state.requestQuestionsList.join(',')
     console.log('sendRatingsRequests:requestQuestionsList', questions)
     
@@ -119,10 +118,8 @@ class App extends Component {
         let transactionBuilder = new BITBOX.TransactionBuilder("testnet");
         // original amount of satoshis in vin
         let originalAmount = result[0].satoshis;
-        //let originalAmount = 2699889342
         // index of vout
         let vout = result[0].vout;
-
         // txid of vout
         let txid = result[0].txid;
         // add input with txid and index of vout
@@ -131,9 +128,8 @@ class App extends Component {
         // get byte count to calculate fee. paying 1 sat/byte
         let byteCount = BITBOX.BitcoinCash.getByteCount(
           { P2PKH: 1 },
-          { P2PKH: 3 }
-          );
-        // 192
+          { P2PKH: 5 }
+        );
         // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
         let sendAmount = originalAmount - byteCount;
 
@@ -170,10 +166,10 @@ class App extends Component {
         this.setState({
           hex: hex
         });
-
         // TODO: comment out to send
-        return false;
+        //return false;
         // sendRawTransaction to running BCH node
+        console.log('sendRatingsRequests:hex ', hex)
         BITBOX.RawTransactions.sendRawTransaction(hex).then(
           result => {
             console.log('successfully send transaction:', result)
@@ -204,10 +200,10 @@ class App extends Component {
             let decodedScript = this.decodeScript(o.scriptPubKey.hex)
             let tmpArr = decodedScript.split(',')
             // AppScriptPrefix, messageType, reviewTypes, questionKeys
-            if (tmpArr[1] == messageTypes.request) {
-              this.state.receivedQuestionsList = ['p1','p3']
-            } else if (tmpArr[1] == messageTypes.reply) {
-              this.state.receivedAnswersList = ['p1:5', 'p3:8']
+            if (tmpArr[1] === messageTypes.request) {
+              this.state.receivedQuestionsList = tmpArr.slice(3, tmpArr.length + 1) // ['p1','p3']
+            } else if (tmpArr[1] === messageTypes.reply) {
+              this.state.receivedAnswersList = tmpArr.slice(3, tmpArr.length + 1) //['p1:5', 'p3:8']
             }
             
             console.log('getScriptFromTransaction:decoded = ', decodedScript)
@@ -265,7 +261,7 @@ class App extends Component {
         // get byte count to calculate fee. paying 1 sat/byte
         let byteCount = BITBOX.BitcoinCash.getByteCount(
           { P2PKH: 1 },
-          { P2PKH: 3 }
+          { P2PKH: 5 }
           );
         // 192
         // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
@@ -337,8 +333,8 @@ class App extends Component {
   }
 
   sendRequest = () => {
+    this.state.requestQuestionsList= []
   
-  this.state.requestQuestionsList= [];
   
   if(this.state.askCommSkills)
   {
@@ -350,10 +346,6 @@ class App extends Component {
     this.state.requestQuestionsList.push('p1')
   }
   this.sendRatingsRequests()
-
-    console.log('Sending......' );
-    console.log('Done......' );
-
   }
 
   handleOnChangeAddress1 = (e) => {
@@ -363,44 +355,42 @@ class App extends Component {
   }
       
   handleOnChangeAddress2 = (e) => {
-          this.setState({
+    this.setState({
       address2: e.target.value
-          })
-        }
+    })
+  }
 
-handleOnChangeAsk1 = (e) => {
-      this.setState({
-        askWorkWithOther: e.target.checked
-      })
-    }
+  handleOnChangeAsk1 = (e) => {
+    this.setState({
+      askWorkWithOther: e.target.checked
+    })
+  }
         
     handleOnChangeAsk2 = (e) => {
-
-            this.setState({
-                askCommSkills: e.target.checked
-
-            })
-          }
+      this.setState({
+        askCommSkills: e.target.checked
+      })
+    }
 
     sendFeedback = () => {
-    // this.sendRatingsRequests()
-    this.state.answerList= [];
-    
-    if(this.state.commSkills)
-    {
-      this.state.answerList.push('p2:'+ this.state.commSkills)
-    }
- 
-    if(this.state.workWithOther)
-    {
-    this.state.answerList.push('p1:'+ this.state.workWithOther)
-    }
-   }
+      // this.sendRatingsRequests()
+      this.state.answerList= [];
+      
+      if(this.state.commSkills)
+      {
+        this.state.answerList.push('p2:'+ this.state.commSkills)
+      }
+
+      if(this.state.workWithOther)
+      {
+      this.state.answerList.push('p1:'+ this.state.workWithOther)
+      }
+    }
 
 
    fetchFeedback = () => {
-    this.getRatingsRequest(this.state.addressForFeedback)
-  }
+      this.getRatingsRequest(this.state.addressForFeedback)
+   }
 
 handleOnChangeAddressForFeedback = (e) => {
       this.setState({
@@ -515,9 +505,9 @@ handleOnChangeAddressForFeedback = (e) => {
             {  
              
               this.state.receivedQuestionsList.map(function(item, index) {
-              console.log(item.toString())
+              //console.log(item.toString())
             if(item === 'p1'){
-              console.log(item.toString());
+             // console.log(item.toString());
             return <div key={index}>
             <h3>Works Well With Others</h3> 
             <Slider  value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} max={10} step={1} onChange={this.handleOnChangeSlider1}/> 
