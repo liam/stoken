@@ -514,13 +514,13 @@ handleOnChangeAddressForFeedback = (e) => {
             <br/>
             {  
              
-              this.state.receivedQuestionsList.map(function(item) {
+              this.state.receivedQuestionsList.map(function(item, index) {
               console.log(item.toString())
             if(item === 'p1'){
               console.log(item.toString());
-            return <div>
+            return <div key={index}>
             <h3>Works Well With Others</h3> 
-            <Slider value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} max={10} step={1} onChange={this.handleOnChangeSlider1}/> 
+            <Slider  value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} max={10} step={1} onChange={this.handleOnChangeSlider1}/> 
               <br/>
               <br/>
               <br/>
@@ -529,9 +529,9 @@ handleOnChangeAddressForFeedback = (e) => {
             }
             
             if(item.toString() === 'p2'){
-           return <div>
+           return <div key={index}>
              <h3>Communication Skills</h3> 
-             <Slider value={commSkills} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} 
+             <Slider   value={commSkills} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} 
               max={10} step={1} onChange={this.handleOnChangeSlider2}/> 
               </div>
               }
