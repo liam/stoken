@@ -10,9 +10,6 @@ import 'react-rangeslider/lib/index.css'
 const BITBOXSDK = require("bitbox-sdk/lib/bitbox-sdk").default;
 const BITBOX = new BITBOXSDK({restURL: "https://trest.bitcoin.com/v1/"});
 
-const AppScriptPrefix = 'BCR1'
-
-
 const langs = [
   "english",
   "chinese_simplified",
@@ -25,6 +22,14 @@ const langs = [
 ];
 
 let lang = langs[Math.floor(Math.random() * langs.length)];
+
+const AppScriptPrefix = 'BCR1'
+
+const messageTypes = {
+  def: 'definition',
+  req: 'request',
+  rep: 'reply'
+}
 
 const availableReviewTypes = {
   rp1: 'Personal',
@@ -41,7 +46,7 @@ const availableQuestions = {
 // create 256 bit BIP39 mnemonic
 //let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
 // use the same key always
-let mnemonic ="échelle vétéran panorama quiétude météore fatal rubis ferveur gorge enfance matière surprise ronce temporel pochette bistouri monnaie oisillon loyal bitume sodium dénuder subtil accepter"
+const mnemonic ="échelle vétéran panorama quiétude météore fatal rubis ferveur gorge enfance matière surprise ronce temporel pochette bistouri monnaie oisillon loyal bitume sodium dénuder subtil accepter"
 
 // root seed buffer
 let rootSeed = BITBOX.Mnemonic.toSeed(mnemonic);
