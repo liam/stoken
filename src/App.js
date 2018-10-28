@@ -366,7 +366,7 @@ handleOnChangeAddressForFeedback = (e) => {
         <br/>
         <br/>
 
-        //************************* Request  Feedback *************************/
+        {/* ************************* Request  Feedback ************************* */}
         <Panel bsStyle="info">
           <Panel.Heading>
             <Panel.Title componentClass="h2">Create a feedback request</Panel.Title>
@@ -407,7 +407,7 @@ handleOnChangeAddressForFeedback = (e) => {
          <br/>
          <br/>
         
-        //************************* Provide  Feedback *************************/
+        {/* ************************* Provide  Feedback ************************* */}
 
         <Panel bsStyle="success">
           <Panel.Heading>
@@ -446,7 +446,7 @@ handleOnChangeAddressForFeedback = (e) => {
          <br/>
          <br/>
         
-        //************************* View  Feedback *************************/
+        {/* ************************* View  Feedback ************************* */}
         <Panel bsStyle="primary">
           <Panel.Heading>
             <Panel.Title componentClass="h3">View feedback</Panel.Title>
