@@ -78,7 +78,7 @@ class App extends Component {
       askCommSkills: false,
       askWorkWithOther: false,
       requestQuestionsList: [],   // p1,p2
-      receivedQuestionsList: [],  // p1,p2
+      receivedQuestionsList: ['p1','p2'],  // p1,p2
       receivedAnswersList: [],    // p1:4,p2:8
       answerList:[],
       addressForFeedback: 'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd' //Address of feedback provider 1 to fetch request 
@@ -425,7 +425,7 @@ handleOnChangeAddressForFeedback = (e) => {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Reftrust</h1>
+          <h1 className="App-title">Ref Trust</h1>
           <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" ></link>
           <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" ></link>
         </header>
@@ -510,14 +510,34 @@ handleOnChangeAddressForFeedback = (e) => {
             <button className="btn btn-primary" onClick={this.fetchFeedback}>
              Fetch Request
             </button>
-          
-            <h3>Works Well With Others</h3> 
-            <Slider value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0}           max={10} step={1} onChange={this.handleOnChangeSlider1}/> 
+<br/>
             <br/>
-            <br/>   
-           <h3>Communication Skills</h3> 
-           <Slider value={commSkills} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} 
-            max={10} step={1} onChange={this.handleOnChangeSlider2}/> 
+            {  
+             
+              this.state.receivedQuestionsList.map(function(item) {
+              console.log(item.toString())
+            if(item === 'p1'){
+              console.log(item.toString());
+            return <div>
+            <h3>Works Well With Others</h3> 
+            <Slider value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} max={10} step={1} onChange={this.handleOnChangeSlider1}/> 
+              <br/>
+              <br/>
+              <br/>
+
+              </div>
+            }
+            
+            if(item.toString() === 'p2'){
+           return <div>
+             <h3>Communication Skills</h3> 
+             <Slider value={commSkills} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} 
+              max={10} step={1} onChange={this.handleOnChangeSlider2}/> 
+              </div>
+              }
+            }, this) 
+            
+            }
             <br/>
             <br/> 
             <button className="btn btn-primary" onClick={this.sendFeedback}>
