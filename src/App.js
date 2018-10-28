@@ -91,7 +91,7 @@ class App extends Component {
 
     let ss = AppScriptPrefix.concat(',', [formType, messageType, text])
     console.log('script text:', ss)
-    return BITBOX.Script.nullData.output.encode(Buffer.from(text, 'ascii'))
+    return BITBOX.Script.nullData.output.encode(Buffer.from(ss, 'ascii'))
   }
 
   decodeScript(hex) {
@@ -168,7 +168,7 @@ class App extends Component {
           hex: hex
         });
         // TODO: comment out to send
-        return false;
+       // return false;
         // sendRawTransaction to running BCH node
         console.log('sendRatingsRequests:hex ', hex)
         BITBOX.RawTransactions.sendRawTransaction(hex).then(
@@ -294,7 +294,7 @@ class App extends Component {
         });
 
         // TODO: comment out to send
-        return false;
+        //return false;
         // sendRawTransaction to running BCH node
         BITBOX.RawTransactions.sendRawTransaction(hex).then(
           result => {
@@ -396,15 +396,7 @@ handleOnChangeAddressForFeedback = (e) => {
   render() {
     let addresses = [];
     let { commSkills, workWithOther} = this.state
-    // for (let i = 0; i < 10; i++) {
-    //   let account = masterHDNode.derivePath(`m/44'/145'/0'/0/${i}`);
-    //   addresses.push(
-    //     <li key={i}>
-    //       m/44&rsquo;/145&rsquo;/0&rsquo;/0/
-    //       {i}: {BITBOX.HDNode.toCashAddress(account)}
-    //     </li>
-    //   );
-    // }
+    
     return (
       <div className="App">
         <header className="App-header">
@@ -470,10 +462,7 @@ handleOnChangeAddressForFeedback = (e) => {
             </button>
           </Panel.Body>
         </Panel>
-         <br/>
-         <br/>
-         <br/>
-        
+        <br/><br/><br/><br/><br/><br/>
         {/* ************************* Provide  Feedback ************************* */}
 
         <Panel bsStyle="success">
@@ -490,18 +479,16 @@ handleOnChangeAddressForFeedback = (e) => {
               placeholder="Check request"
               onChange={this.handleOnChangeAddressForFeedback}
             />
-<br/>
+            <br/>
             <button className="btn btn-primary" onClick={this.fetchFeedback}>
              Fetch Request
             </button>
-<br/>
+            <br/>
             <br/>
             {  
              
               this.state.receivedQuestionsList.map(function(item, index) {
-              //console.log(item.toString())
             if(item === 'p1'){
-             // console.log(item.toString());
             return <div key={index}>
             <h3>Works Well With Others</h3> 
             <Slider  value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0} max={10} step={1} onChange={this.handleOnChangeSlider1}/> 
@@ -529,9 +516,7 @@ handleOnChangeAddressForFeedback = (e) => {
              </button>
           </Panel.Body>
         </Panel>
-         <br/>
-         <br/>
-         <br/>
+         <br/><br/><br/><br/><br/><br/>
         
         {/* ************************* View  Feedback ************************* */}
         <Panel bsStyle="primary">
@@ -539,7 +524,7 @@ handleOnChangeAddressForFeedback = (e) => {
             <Panel.Title componentClass="h3">View feedback</Panel.Title>
           </Panel.Heading>
           <Panel.Body>
-          <h2>Recieved on 25/10/2018</h2>
+          <h2>Recieved on 28/10/2018 12:33</h2>
           <h3>
           Works Well With Others   <Badge>{9}</Badge>
           </h3>
@@ -547,7 +532,7 @@ handleOnChangeAddressForFeedback = (e) => {
           Communication Skills     <Badge>{5}</Badge>
           </h3>
           <br/>
-          <h2>Recieved on 23/10/2018</h2>
+          <h2>Recieved on 28/10/2018 12:28</h2>
           <h3>
           Works Well With Others   <Badge>{this.state.workWithOther}</Badge>
           </h3>
@@ -556,6 +541,7 @@ handleOnChangeAddressForFeedback = (e) => {
           </h3>
           </Panel.Body>
         </Panel>
+         <br/><br/><br/><br/><br/><br/>
 
         </div>
       </div>
