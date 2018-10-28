@@ -73,10 +73,12 @@ class App extends Component {
       txid: "",
       commSkills: 0,
       workWithOther:0,
-      address1:'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd',
-      address2:'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et',
+      address1:'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', //Feedback  1 provider address 
+      address2:'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et', //Feedback  1 provider address 
       askCommSkills: false,
-      askWorkWithOther: false
+      askWorkWithOther: false,
+      requestQuestionsList: [],
+      addressForFeedback: 'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd' //Address of feedback provider 1 to fetch request 
     };
   }  
   
@@ -274,8 +276,19 @@ class App extends Component {
 
   sendRequest = () => {
     this.sendRatingsRequests()
-    console.log('commsSkill:',this.state.commSkills );
-    console.log('workWithOthers:',this.state.workWithOther );
+
+    this.state.requestQuestionsList= [];
+    
+    if(this.state.commSkills)
+    {
+      this.state.requestQuestionsList.push('p2')
+    }
+    
+    if(this.state.workWithOther)
+    {
+      this.state.requestQuestionsList.push('p1')
+    }
+
     console.log('Sending......' );
     console.log('Done......' );
 
@@ -313,8 +326,21 @@ handleOnChangeAsk1 = (e) => {
      console.log('workWithOthers:',this.state.workWithOther );
      console.log('Sending......' );
      console.log('Done......' );
+
  
    }
+
+
+   fetchFeedback = () => {
+    console.log('Address for feadback:',this.state.addressForFeedback );
+  }
+
+handleOnChangeAddressForFeedback = (e) => {
+      this.setState({
+          addressForFeedback: e.target.value
+      })
+    }
+
 
   render() {
     let addresses = [];
@@ -340,6 +366,7 @@ handleOnChangeAsk1 = (e) => {
         <br/>
         <br/>
 
+        //************************* Request  Feedback *************************/
         <Panel bsStyle="info">
           <Panel.Heading>
             <Panel.Title componentClass="h2">Create a feedback request</Panel.Title>
@@ -361,7 +388,7 @@ handleOnChangeAsk1 = (e) => {
               onChange={this.handleOnChangeAddress1}
             />
            <br/>
-            <h4>Request Feedback from address 1 </h4>
+            <h4>Request Feedback from address 2 </h4>
             <FormControl
               label="Text"
               type="text"
@@ -379,12 +406,28 @@ handleOnChangeAsk1 = (e) => {
          <br/>
          <br/>
          <br/>
+        
+        //************************* Provide  Feedback *************************/
+
         <Panel bsStyle="success">
           <Panel.Heading>
             <Panel.Title componentClass="h3">Create a feedback request</Panel.Title>
           </Panel.Heading>
             <Panel.Body>Panel content
             <h2>Provide feedback </h2>
+
+              <h4>Address</h4>
+              <FormControl
+              type="text"
+              value={this.state.addressForFeedback}
+              placeholder="Check request"
+              onChange={this.handleOnChangeAddressForFeedback}
+            />
+<br/>
+            <button className="btn btn-primary" onClick={this.fetchRequest}>
+             Fetch Request
+            </button>
+          
             <h3>Works Well With Others</h3> 
             <Slider value={workWithOther} orientation="horizontal" labels={{ 0:'Low', 5:'Medium', 10:"High"}} tooltip={true} min={0}           max={10} step={1} onChange={this.handleOnChangeSlider1}/> 
             <br/>
@@ -402,12 +445,14 @@ handleOnChangeAsk1 = (e) => {
          <br/>
          <br/>
          <br/>
-
+        
+        //************************* View  Feedback *************************/
         <Panel bsStyle="primary">
           <Panel.Heading>
             <Panel.Title componentClass="h3">View feedback</Panel.Title>
           </Panel.Heading>
           <Panel.Body>
+          {/* <h2>Recieved on </h2> */}
           <h3>
           Works Well With Others   <Badge>{this.state.workWithOther}</Badge>
           </h3>
