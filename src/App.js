@@ -77,7 +77,9 @@ class App extends Component {
       address2:'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et', //Feedback  1 provider address 
       askCommSkills: false,
       askWorkWithOther: false,
-      requestQuestionsList: [],
+      requestQuestionsList: [],   // p1,p2
+      receivedQuestionsList: [],  // p1,p2
+      receivedAnswersList: [],    // p1:4,p2:8
       answerList:[],
       addressForFeedback: 'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd' //Address of feedback provider 1 to fetch request 
     };
@@ -200,6 +202,13 @@ class App extends Component {
           if (!o.scriptPubKey.addresses){
             console.log('getScriptFromTransaction:script = ', o.scriptPubKey.hex)
             let decodedScript = this.decodeScript(o.scriptPubKey.hex)
+            let tmpArr = decodedScript.split(',')
+            // AppScriptPrefix, messageType, reviewTypes, questionKeys
+            if (tmpArr[1] == messageTypes.request) {
+              this.state.receivedQuestionsList = ['p1','p3']
+            } else if (tmpArr[1] == messageTypes.reply) {
+              this.state.receivedAnswersList = ['p1:5', 'p3:8']
+            }
             
             console.log('getScriptFromTransaction:decoded = ', decodedScript)
 
