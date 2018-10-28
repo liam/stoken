@@ -7,10 +7,13 @@ import {Badge , Panel , FormGroup, Checkbox , FormControl} from 'react-bootstrap
 import "./App.css";
 import 'react-rangeslider/lib/index.css'
 
-let BITBOXSDK = require("bitbox-sdk/lib/bitbox-sdk").default;
-let BITBOX = new BITBOXSDK({restURL: "https://trest.bitcoin.com/v1/"});
+const BITBOXSDK = require("bitbox-sdk/lib/bitbox-sdk").default;
+const BITBOX = new BITBOXSDK({restURL: "https://trest.bitcoin.com/v1/"});
 
-let langs = [
+const AppScriptPrefix = 'BCR1'
+
+
+const langs = [
   "english",
   "chinese_simplified",
   "chinese_traditional",
@@ -22,6 +25,18 @@ let langs = [
 ];
 
 let lang = langs[Math.floor(Math.random() * langs.length)];
+
+const availableReviewTypes = {
+  rp1: 'Personal',
+  cp1: 'Corporate',
+  pp1: 'Product'
+}
+
+const availableQuestions = {
+  p1: 'Works Well With Others', 
+  p2: 'Communication Skills',
+  p3: 'Leadership Skills'
+}
 
 // create 256 bit BIP39 mnemonic
 //let mnemonic = BITBOX.Mnemonic.generate(256, BITBOX.Mnemonic.wordLists()[lang]);
@@ -60,7 +75,9 @@ class App extends Component {
     };
   }  
   
-  encodeScript(text) {
+  encodeScript(formType, text) {
+    let ss = AppScriptPrefix.concat(',', [formType, text])
+    console.log('script text:', ss)
     return BITBOX.Script.nullData.output.encode(Buffer.from(text, 'ascii'))
   }
 
@@ -70,7 +87,7 @@ class App extends Component {
 
   sendRatingsRequests(/** addresses, questions*/) {
     let addresses = ['bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', 'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et']
-    let questions = 'w1,c1'
+    let questions = 'p1,p1'
     
     const reviewCost = 100
 
@@ -105,15 +122,15 @@ class App extends Component {
         // add output w/ address and amount to send
         transactionBuilder.addOutput(cashAddress, sendAmount);
 
-        addresses.array.forEach(address => {
+        addresses.forEach(address => {
           transactionBuilder.addOutput(address, reviewCost)          
         });
 
         // keypair
         let keyPair = BITBOX.HDNode.toKeyPair(change);
 
-        // sign w/ HDNode
-        let buf = this.encodeScript(questions);
+        // 
+        let buf = this.encodeScript('personal', questions);
 
         transactionBuilder.addOutput(buf, 0);
 
@@ -195,7 +212,7 @@ class App extends Component {
         let keyPair = BITBOX.HDNode.toKeyPair(change);
 
         // sign w/ HDNode
-        let buf = this.encodeScript('test for beetles');
+        let buf = this.encodeScript('personal', 'test for beetles');
 
         transactionBuilder.addOutput(buf, 0);
 
@@ -251,7 +268,7 @@ class App extends Component {
   }
 
   sendRequest = () => {
-   // this.sendRatingsRequests()
+    this.sendRatingsRequests()
     console.log('commsSkill:',this.state.commSkills );
     console.log('workWithOthers:',this.state.workWithOther );
     console.log('Sending......' );
