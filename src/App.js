@@ -23,7 +23,7 @@ const langs = [
 
 let lang = langs[Math.floor(Math.random() * langs.length)];
 
-const AppScriptPrefix = 'BCR1'
+const AppScriptPrefix = 'RT1'
 
 const messageTypes = {
   def: 'definition',
@@ -94,6 +94,12 @@ class App extends Component {
   }
 
   sendRatingsRequests(/** addresses, questions*/) {
+    /*
+    Example of OP_RETURN
+    'RT1,req,rp1,p1,p2,p3'
+    AppScriptPrefix, messageType, reviewTypes, questionKeys
+
+    */
     let addresses = ['bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', 'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et']
     let questions = 'p1,p1'
     
@@ -174,6 +180,48 @@ class App extends Component {
             console.log('error sending transaction:', err);
           }
         );
+      },
+      err => {
+        console.log("error", err);
+      }
+    );
+  }
+
+  getScriptFromTransaction(transactionId) {      
+    BITBOX.Transaction.details([transactionId]).then(
+      result => {
+        if (result.length === 0) {
+          return
+        }
+        result[0].vout.forEach(o => {
+          if (!o.scriptPubKey.addresses){
+            console.log('getScriptFromTransaction:script = ', o.scriptPubKey.hex)
+            let decodedScript = this.decodeScript(o.scriptPubKey.hex)
+            console.log('getScriptFromTransaction:decoded = ', decodedScript)
+
+            this.setState({
+              receivedScript: decodedScript
+            });
+          return o.scriptPubKey.hex
+          }
+        })
+      },
+      err => {
+      console.log('error getting script', err)
+      }
+    )
+  }
+   
+
+  getRatingsRequest(address) {
+    // let address = 'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd'
+    BITBOX.Address.utxo(address).then(
+      async result => {
+        if (!result[0]) {
+          return;
+        }
+        console.log('getRatingsRequest:txid: ', result[0].txid)
+        this.getScriptFromTransaction(result[0].txid)
       },
       err => {
         console.log("error", err);
@@ -338,7 +386,7 @@ handleOnChangeAsk1 = (e) => {
 
 
    fetchFeedback = () => {
-    console.log('Address for feadback:',this.state.addressForFeedback );
+    this.getRatingsRequest(this.state.addressForFeedback)
   }
 
 handleOnChangeAddressForFeedback = (e) => {
@@ -364,7 +412,7 @@ handleOnChangeAddressForFeedback = (e) => {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">BlokkFeedbackChain</h1>
+          <h1 className="App-title">Reftrust</h1>
           <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" ></link>
           <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" ></link>
         </header>
@@ -446,7 +494,7 @@ handleOnChangeAddressForFeedback = (e) => {
               onChange={this.handleOnChangeAddressForFeedback}
             />
 <br/>
-            <button className="btn btn-primary" onClick={this.fetchRequest}>
+            <button className="btn btn-primary" onClick={this.fetchFeedback}>
              Fetch Request
             </button>
           
