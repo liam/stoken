@@ -26,15 +26,15 @@ let lang = langs[Math.floor(Math.random() * langs.length)];
 const AppScriptPrefix = 'RT1'
 
 const messageTypes = {
-  def: 'definition',
-  req: 'request',
-  rep: 'reply'
+  define: 'def',
+  request: 'req',
+  reply: 'rep'
 }
 
 const availableReviewTypes = {
-  rp1: 'Personal',
-  cp1: 'Corporate',
-  pp1: 'Product'
+  personal: 'per',
+  corporate: 'corp',
+  product: 'prod'
 }
 
 const availableQuestions = {
@@ -83,8 +83,10 @@ class App extends Component {
     };
   }  
   
-  encodeScript(formType, text) {
-    let ss = AppScriptPrefix.concat(',', [formType, text])
+  encodeScript(formType, messageType, text) {
+    // AppScriptPrefix, messageType, reviewTypes, questionKeys
+
+    let ss = AppScriptPrefix.concat(',', [formType, messageType, text])
     console.log('script text:', ss)
     return BITBOX.Script.nullData.output.encode(Buffer.from(text, 'ascii'))
   }
@@ -93,7 +95,7 @@ class App extends Component {
     return BITBOX.Script.nullData.output.decode(Buffer.from(hex, 'hex')).toString('ascii');
   }
 
-  sendRatingsRequests(/** addresses, questions*/) {
+  sendRatingsRequests() {
     /*
     Example of OP_RETURN
     'RT1,req,rp1,p1,p2,p3'
@@ -101,7 +103,8 @@ class App extends Component {
 
     */
     let addresses = ['bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', 'bchtest:qq7n8p6vxlauu3mnd67watyzmk5v46qgp5s4gv96et']
-    let questions = 'p1,p1'
+    let questions = this.state.requestQuestionsList.join(',')
+    console.log('sendRatingsRequests:requestQuestionsList', questions)
     
     const reviewCost = 100
 
@@ -144,7 +147,7 @@ class App extends Component {
         let keyPair = BITBOX.HDNode.toKeyPair(change);
 
         // 
-        let buf = this.encodeScript('personal', questions);
+        let buf = this.encodeScript(availableReviewTypes.personal, messageTypes.request, questions);
 
         transactionBuilder.addOutput(buf, 0);
 
@@ -197,6 +200,7 @@ class App extends Component {
           if (!o.scriptPubKey.addresses){
             console.log('getScriptFromTransaction:script = ', o.scriptPubKey.hex)
             let decodedScript = this.decodeScript(o.scriptPubKey.hex)
+            
             console.log('getScriptFromTransaction:decoded = ', decodedScript)
 
             this.setState({
@@ -268,8 +272,8 @@ class App extends Component {
         let keyPair = BITBOX.HDNode.toKeyPair(change);
 
         // sign w/ HDNode
-        let buf = this.encodeScript('personal', 'test for beetles');
-
+        let buf = this.encodeScript(availableReviewTypes.personal, messageTypes.reply, this.state.answerList.join(','));
+        console.log('sendRatingsReply:encodedScript:', buf)
         transactionBuilder.addOutput(buf, 0);
 
         let redeemScript ;
@@ -324,19 +328,19 @@ class App extends Component {
   }
 
   sendRequest = () => {
-    this.sendRatingsRequests()
-
-    this.state.requestQuestionsList= [];
-    
-    if(this.state.askCommSkills)
-    {
-      this.state.requestQuestionsList.push('p2')
-    }
-    
-    if(this.state.askWorkWithOther)
-    {
-      this.state.requestQuestionsList.push('p1')
-    }
+  
+  this.state.requestQuestionsList= [];
+  
+  if(this.state.askCommSkills)
+  {
+    this.state.requestQuestionsList.push('p2')
+  }
+  
+  if(this.state.askWorkWithOther)
+  {
+    this.state.requestQuestionsList.push('p1')
+  }
+  this.sendRatingsRequests()
 
     console.log('Sending......' );
     console.log('Done......' );
@@ -375,12 +379,12 @@ handleOnChangeAsk1 = (e) => {
     
     if(this.state.commSkills)
     {
-      this.state.answerList.push('p2:'+ commSkills)
+      this.state.answerList.push('p2:'+ this.state.commSkills)
     }
  
     if(this.state.workWithOther)
     {
-    this.state.answerList.push('p1:'+ workWithOther)
+    this.state.answerList.push('p1:'+ this.state.workWithOther)
     }
    }
 
