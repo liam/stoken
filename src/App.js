@@ -81,7 +81,8 @@ class App extends Component {
       receivedQuestionsList: ['p1','p2'],  // p1,p2
       receivedAnswersList: [],    // p1:4,p2:8
       answerList:[],
-      addressForFeedback: 'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd' // Address of feedback provider 1 to fetch request 
+      addressForFeedback: 'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd', // Address of feedback provider 1 to fetch request 
+      requesterAddress: 'bchtest:qqpmqdsqxrxd33qf56q6du28fxtv2e962utrge2f0h'
     };
   }  
   
@@ -167,7 +168,7 @@ class App extends Component {
           hex: hex
         });
         // TODO: comment out to send
-        //return false;
+        return false;
         // sendRawTransaction to running BCH node
         console.log('sendRatingsRequests:hex ', hex)
         BITBOX.RawTransactions.sendRawTransaction(hex).then(
@@ -238,8 +239,8 @@ class App extends Component {
     );
   }
 
-  sendRatingsReply(address, answers) {
-    BITBOX.Address.utxo(cashAddress).then(
+  sendRatingsReply() {
+    BITBOX.Address.utxo(this.state.requesterAddress).then(
       result => {
         if (!result[0]) {
           return;
@@ -248,16 +249,14 @@ class App extends Component {
         let transactionBuilder = new BITBOX.TransactionBuilder("testnet");
         // original amount of satoshis in vin
         let originalAmount = result[0].satoshis;
-        //let originalAmount = 2699889342
         // index of vout
         let vout = result[0].vout;
-
         // txid of vout
         let txid = result[0].txid;
         // add input with txid and index of vout
         transactionBuilder.addInput(txid, vout);
         
-        let anotherAddress = "bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd"
+        // let requesterAddress = "bchtest:qqpmqdsqxrxd33qf56q6du28fxtv2e962utrge2f0h"
         // get byte count to calculate fee. paying 1 sat/byte
         let byteCount = BITBOX.BitcoinCash.getByteCount(
           { P2PKH: 1 },
@@ -267,18 +266,13 @@ class App extends Component {
         // amount to send to receiver. It's the original amount - 1 sat/byte for tx size
         let sendAmount = originalAmount - byteCount;
 
-        let reviewCost = 100
-        sendAmount -= reviewCost
         // add output w/ address and amount to send
-        transactionBuilder.addOutput(cashAddress, sendAmount);
-        transactionBuilder.addOutput(anotherAddress, reviewCost)
-        // change address bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd
+        transactionBuilder.addOutput(this.state.requesterAddress, sendAmount)
         // keypair
         let keyPair = BITBOX.HDNode.toKeyPair(change);
 
         // sign w/ HDNode
         let buf = this.encodeScript(availableReviewTypes.personal, messageTypes.reply, this.state.answerList.join(','));
-        console.log('sendRatingsReply:encodedScript:', buf)
         transactionBuilder.addOutput(buf, 0);
 
         let redeemScript ;
@@ -373,19 +367,19 @@ class App extends Component {
     }
 
     sendFeedback = () => {
-      // this.sendRatingsRequests()
-      this.state.answerList= [];
-      
-      if(this.state.commSkills)
-      {
-        this.state.answerList.push('p2:'+ this.state.commSkills)
-      }
-
-      if(this.state.workWithOther)
-      {
+    this.state.answerList= [];
+    
+    if(this.state.commSkills)
+    {
+      this.state.answerList.push('p2:'+ this.state.commSkills)
+    }
+    
+    if(this.state.workWithOther)
+    {
       this.state.answerList.push('p1:'+ this.state.workWithOther)
-      }
-    }
+    }
+    this.sendRatingsReply()
+  }
 
 
    fetchFeedback = () => {
