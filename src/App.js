@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import logo from "./logo.png";
+import logo from "./ref_trust.jpeg";
 import Slider from 'react-rangeslider'
 import {Badge , Panel , FormGroup, Checkbox , FormControl ,ControlLabel} from 'react-bootstrap'
 
@@ -78,6 +78,7 @@ class App extends Component {
       askCommSkills: false,
       askWorkWithOther: false,
       requestQuestionsList: [],
+      answerList:[],
       addressForFeedback: 'bchtest:qpfvuahs9hksp4xvy85pdlvcvr98tjww7sp3gz38dd' //Address of feedback provider 1 to fetch request 
     };
   }  
@@ -279,12 +280,12 @@ class App extends Component {
 
     this.state.requestQuestionsList= [];
     
-    if(this.state.commSkills)
+    if(this.state.askCommSkills)
     {
       this.state.requestQuestionsList.push('p2')
     }
     
-    if(this.state.workWithOther)
+    if(this.state.askWorkWithOther)
     {
       this.state.requestQuestionsList.push('p1')
     }
@@ -322,12 +323,17 @@ handleOnChangeAsk1 = (e) => {
 
     sendFeedback = () => {
     // this.sendRatingsRequests()
-     console.log('commsSkill:',this.state.commSkills );
-     console.log('workWithOthers:',this.state.workWithOther );
-     console.log('Sending......' );
-     console.log('Done......' );
-
+    this.state.answerList= [];
+    
+    if(this.state.commSkills)
+    {
+      this.state.answerList.push('p2:'+ commSkills)
+    }
  
+    if(this.state.workWithOther)
+    {
+    this.state.answerList.push('p1:'+ workWithOther)
+    }
    }
 
 
