@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import logo from "./logo.png";
 import Slider from 'react-rangeslider'
-import {Badge , Panel , FormGroup, Checkbox , FormControl} from 'react-bootstrap'
+import {Badge , Panel , FormGroup, Checkbox , FormControl ,ControlLabel} from 'react-bootstrap'
 
 
 import "./App.css";
@@ -372,10 +372,26 @@ handleOnChangeAddressForFeedback = (e) => {
             <Panel.Title componentClass="h2">Create a feedback request</Panel.Title>
           </Panel.Heading>
           <Panel.Body >
+          
+          <FormGroup controlId="formControlsSelect">
+            <ControlLabel>Select feedback type</ControlLabel>
+              <FormControl componentClass="select" placeholder="personal">
+                {/* <option value="select">select</option> */}
+                <option value="personal">Personal Feedback</option>
+                <option value="product">Product Feedback</option>
+                <option value="corporate">Corporate Feedback</option>
+              </FormControl>
+          </FormGroup>
+                        <br/>
+                        <br/>
+
             <h4>Select questions</h4>
 
             <FormGroup>
-              <Checkbox inline onChange={this.handleOnChangeAsk1}>Works Well With Others</Checkbox> <Checkbox inline onChange={this.handleOnChangeAsk2}>Communication Skills</Checkbox>
+              <Checkbox inline onChange={this.handleOnChangeAsk1}>Works Well With Others</Checkbox> 
+              <Checkbox inline onChange={this.handleOnChangeAsk2}>Communication Skills</Checkbox>
+              <Checkbox inline >Leadership Skills</Checkbox>
+
               <br/>
               <br/>
               <br/>
@@ -411,7 +427,7 @@ handleOnChangeAddressForFeedback = (e) => {
 
         <Panel bsStyle="success">
           <Panel.Heading>
-            <Panel.Title componentClass="h3">Create a feedback request</Panel.Title>
+            <Panel.Title componentClass="h3">Provide feedback</Panel.Title>
           </Panel.Heading>
             <Panel.Body>Panel content
             <h2>Provide feedback </h2>
@@ -452,7 +468,15 @@ handleOnChangeAddressForFeedback = (e) => {
             <Panel.Title componentClass="h3">View feedback</Panel.Title>
           </Panel.Heading>
           <Panel.Body>
-          {/* <h2>Recieved on </h2> */}
+          <h2>Recieved on 25/10/2018</h2>
+          <h3>
+          Works Well With Others   <Badge>{9}</Badge>
+          </h3>
+          <h3>
+          Communication Skills     <Badge>{5}</Badge>
+          </h3>
+          <br/>
+          <h2>Recieved on 23/10/2018</h2>
           <h3>
           Works Well With Others   <Badge>{this.state.workWithOther}</Badge>
           </h3>
